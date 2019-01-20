@@ -1,14 +1,31 @@
+//! # Minigrep
+//!
+//! `minigrep` is a basic Rust implementation of grep
+
 use std::fs;
 use std::error::Error;
 use std::env;
 
+/// A structure to keep the arguments passed to minigrep via the terminal
 pub struct Config {
+    /// Query to search for in the given file
     pub query: String,
+    /// The file to search
     pub filename: String,
+    /// Whether the search should be case-sensitive or not
     pub case_sensitive: bool,
 }
 
 impl Config {
+    /// Creates a new instance of Config using the passed arguments iterator.
+    /// The search is configured to be case-sensitive by default.
+    ///
+    /// # Examples:
+    /// 
+    /// ```
+    /// // would produce an Err if required arguments not provided from terminal
+    /// let config = minigrep::Config::new(std::env::args());
+    /// ```
     pub fn new(mut args: std::env::Args) -> Result<Config, &'static str> {
         args.next();
         let query = match args.next() {
@@ -24,6 +41,15 @@ impl Config {
     }
 }
 
+/// Run the program with the given Config instance
+///
+/// # Examples:
+/// 
+/// ```
+/// let (query, filename, case_sensitive) = (String::from("to"), String::from("poem.txt"), false);
+/// let config = minigrep::Config {query, filename, case_sensitive,};
+/// minigrep::run(config);
+/// ```
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.filename)?;
     let results = if config.case_sensitive {
